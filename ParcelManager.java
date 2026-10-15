@@ -31,13 +31,19 @@ public class ParcelManager implements ParcelOperations {
         return false;
     }
 
+    // Throws an exception if the tracking number is already used by another parcel
+    public void checkNewTrackingNumber(String trackingNumber)
+            throws DuplicateTrackingNumberException {
+        if (trackingExists(trackingNumber)) {
+            throw new DuplicateTrackingNumberException("Tracking number " + trackingNumber
+                    + " already exists! Please use a different one.");
+        }
+    }
+
     // Adds a parcel unless its tracking number already exists
     @Override
     public void addParcel(Parcel parcel) throws DuplicateTrackingNumberException {
-        if (trackingExists(parcel.getTrackingNumber())) {
-            throw new DuplicateTrackingNumberException(
-                    "Tracking number already exists! Please use a different one.");
-        }
+        checkNewTrackingNumber(parcel.getTrackingNumber());
         parcels.add(parcel);
     }
 
@@ -49,7 +55,18 @@ public class ParcelManager implements ParcelOperations {
                 return parcel;
             }
         }
-        throw new ParcelNotFoundException("Parcel not found!");
+        throw new ParcelNotFoundException("Parcel " + trackingNumber + " was not found!");
+    }
+
+    // Finds a parcel that is not yet delivered (only these can still be changed)
+    public Parcel findPendingParcel(String trackingNumber)
+            throws ParcelNotFoundException, ParcelAlreadyDeliveredException {
+        Parcel parcel = findParcel(trackingNumber);
+        if (parcel.isDelivered()) {
+            throw new ParcelAlreadyDeliveredException("Parcel " + trackingNumber
+                    + " has already been delivered!");
+        }
+        return parcel;
     }
 
     // Changes the delivery service of a pending parcel
@@ -57,10 +74,7 @@ public class ParcelManager implements ParcelOperations {
     public void changeService(String trackingNumber, DeliveryStrategy strategy)
             throws ParcelNotFoundException, ParcelAlreadyDeliveredException,
             SameDayNotAllowedException {
-        Parcel parcel = findParcel(trackingNumber);
-        if (parcel.isDelivered()) {
-            throw new ParcelAlreadyDeliveredException("Parcel already delivered!");
-        }
+        Parcel parcel = findPendingParcel(trackingNumber);
         parcel.setStrategy(strategy);
     }
 
@@ -68,10 +82,7 @@ public class ParcelManager implements ParcelOperations {
     @Override
     public void markDelivered(String trackingNumber)
             throws ParcelNotFoundException, ParcelAlreadyDeliveredException {
-        Parcel parcel = findParcel(trackingNumber);
-        if (parcel.isDelivered()) {
-            throw new ParcelAlreadyDeliveredException("Parcel was already delivered.");
-        }
+        Parcel parcel = findPendingParcel(trackingNumber);
         parcel.markDelivered();
     }
 
@@ -79,6 +90,17 @@ public class ParcelManager implements ParcelOperations {
     @Override
     public List<Parcel> getAllParcels() {
         return new ArrayList<>(parcels);
+    }
+
+    // Returns only the parcels that are not yet delivered
+    public List<Parcel> getPendingParcels() {
+        List<Parcel> pending = new ArrayList<>();
+        for (Parcel parcel : parcels) {
+            if (!parcel.isDelivered()) {
+                pending.add(parcel);
+            }
+        }
+        return pending;
     }
 
     // Checks if there are no parcels

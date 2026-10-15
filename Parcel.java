@@ -29,6 +29,9 @@ public abstract class Parcel {
     // Returns the maximum allowed weight for this parcel type
     public abstract double getMaxWeight();
 
+    // Returns extra information that depends on the parcel type (pages, size, note)
+    public abstract String getDetails();
+
     // Returns the chargeable weight as text (whole number by default)
     public String getChargeableWeightText() {
         return String.format("%.0f", getChargeableWeight());

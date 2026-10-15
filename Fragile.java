@@ -2,6 +2,8 @@
 public class Fragile extends Box {
 
     public static final double MAX_WEIGHT = 30.0;
+    public static final double HANDLING_FEE = 100.0;
+    public static final int MAX_NOTE_LENGTH = 60;
 
     private final String handlingNote;
 
@@ -16,7 +18,13 @@ public class Fragile extends Box {
     // Base fee is the Box base fee plus the Php 100 handling fee
     @Override
     public double getBaseFee() {
-        return super.getBaseFee() + 100.0;
+        return super.getBaseFee() + HANDLING_FEE;
+    }
+
+    // A fragile parcel's details are the Box details plus the handling note
+    @Override
+    public String getDetails() {
+        return super.getDetails() + ", note: " + handlingNote;
     }
 
     // Returns the type name

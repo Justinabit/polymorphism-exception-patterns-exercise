@@ -4,6 +4,7 @@ public class Document extends Parcel {
     public static final double MAX_WEIGHT = 0.5;
     public static final int MIN_PAGES = 1;
     public static final int MAX_PAGES = 100;
+    public static final double BASE_FEE = 50.0;
 
     private final int pages;
 
@@ -23,7 +24,7 @@ public class Document extends Parcel {
     // Base fee of a document is a flat Php 50
     @Override
     public double getBaseFee() {
-        return 50.0;
+        return BASE_FEE;
     }
 
     // Returns the type name
@@ -36,6 +37,12 @@ public class Document extends Parcel {
     @Override
     public double getMaxWeight() {
         return MAX_WEIGHT;
+    }
+
+    // A document's details are its number of pages
+    @Override
+    public String getDetails() {
+        return pages + " page(s)";
     }
 
     // Shows a document's chargeable weight with 2 decimals

@@ -2,6 +2,9 @@
 public class Box extends Parcel {
 
     public static final double MAX_WEIGHT = 50.0;
+    public static final int MAX_DIMENSION = 300;
+    public static final double RATE_PER_KG = 40.0;
+    public static final double VOLUMETRIC_DIVISOR = 3500.0;
 
     private final int length;
     private final int width;
@@ -18,7 +21,7 @@ public class Box extends Parcel {
 
     // Calculates the volumetric weight using doubles so large sizes never overflow
     public double getVolumetricWeight() {
-        return (double) length * width * height / 3500.0;
+        return (double) length * width * height / VOLUMETRIC_DIVISOR;
     }
 
     // Chargeable weight is the bigger weight rounded up to the next whole kg
@@ -30,7 +33,7 @@ public class Box extends Parcel {
     // Base fee is Php 40 per chargeable kg
     @Override
     public double getBaseFee() {
-        return 40.0 * getChargeableWeight();
+        return RATE_PER_KG * getChargeableWeight();
     }
 
     // Returns the type name
@@ -43,6 +46,13 @@ public class Box extends Parcel {
     @Override
     public double getMaxWeight() {
         return MAX_WEIGHT;
+    }
+
+    // A box's details are its size and volumetric weight
+    @Override
+    public String getDetails() {
+        return length + " x " + width + " x " + height + " cm, volumetric "
+                + String.format("%.2f", getVolumetricWeight()) + " kg";
     }
 
     // Returns the length in cm
