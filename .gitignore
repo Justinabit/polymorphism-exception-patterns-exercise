@@ -1,2 +1,2 @@
-*.patch
-*.class
+.patch
+.class
